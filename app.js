@@ -3,8 +3,6 @@ const app = express();
 const port = 3000;
 const { addUser } = require("./database/services");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -22,10 +20,7 @@ app.get("/signup", (req, res) => {
 
 app.post("/signup", (req, res) => {
   const { email, password } = req.body;
-
-  bcrypt.hash(password, saltRounds, function (err, hashedPassword) {
-    addUser(email, hashedPassword);
-  });
+  addUser(email, password);
   return res.redirect("/");
 });
 
