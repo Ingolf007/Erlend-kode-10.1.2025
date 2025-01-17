@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-const { addUser } = require("./database/services");
+const { addUser, authenticateUser } = require("./database/services");
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,7 +21,26 @@ app.get("/signup", (req, res) => {
 app.post("/signup", (req, res) => {
   const { email, password } = req.body;
   addUser(email, password);
-  return res.redirect("/");
+  return res.redirect("/signup");
+});
+
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const auth = authenticateUser(email, password);
+
+  if (await auth) {
+    return res.redirect("/dashboard");
+  }
+  return res.redirect("/login");
+});
+
+app.get("/dashboard", (req, res) => {
+  res.render("dashboard");
 });
 
 app.listen(port, () => {

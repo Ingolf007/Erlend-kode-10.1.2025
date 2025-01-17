@@ -14,4 +14,21 @@ async function addUser(email, password) {
   connection.end();
 }
 
-module.exports = { addUser };
+async function authenticateUser(email, password) {
+  const connection = await createConnection();
+
+  connection.connect();
+
+  const query = "SELECT * FROM user WHERE email = ?;";
+  const [rows] = await connection.execute(query, [email]);
+  const user = await rows[0];
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (match) {
+    return true;
+  }
+  connection.end();
+}
+
+module.exports = { addUser, authenticateUser };
